@@ -7,13 +7,13 @@ const galleryContainer = document.querySelector('.gallery');
 const form = document.querySelector('#search-form');
 const loadMoreBtn = document.querySelector('.load-more');
 const apiService = new PixabayApiService();
+const lightbox = new SimpleLightbox('.photo-card a', {});
 
 form.addEventListener('submit', onformSubmit);
 loadMoreBtn.addEventListener('click', onLoadMoreBtn);
 
 async function onformSubmit(e) {
   e.preventDefault();
-
   clearGalleryContainer();
   hideLoadMoreBtn();
 
@@ -25,8 +25,7 @@ async function onformSubmit(e) {
     Notiflix.Notify.failure('Sorry, there are no images matching your search query. Please try again.');
     return;
   }
-
-  addCardsMarkup(dataImg);
+  processCards(dataImg);
   if(isCollectionFinished(dataImg)) return;
   else Notiflix.Notify.success(`Hooray! We found ${dataImg.totalHits} images.`);
   showLoadMoreBtn();
@@ -34,14 +33,23 @@ async function onformSubmit(e) {
 
 async function onLoadMoreBtn() {
   const newDataImg = await apiService.fetchImages();
-  addCardsMarkup(newDataImg);
+  processCards(newDataImg);
   if (isCollectionFinished(newDataImg)) return;
 }
 
-function addCardsMarkup(dataImg) {
+function processCards(dataImg) {
   const cardsMarkup = createCardsMarkup(dataImg.hits);
   galleryContainer.insertAdjacentHTML('beforeend', cardsMarkup);
-  const lightbox = new SimpleLightbox('.photo-card a', {});
+  lightbox.refresh();
+  smoothScroll();
+}
+
+function smoothScroll() {
+  const { height: cardHeight } = document.querySelector(".gallery").firstElementChild.getBoundingClientRect();
+  window.scrollBy({
+    top: cardHeight * 2,
+    behavior: "smooth",
+  });
 }
 
 function isCollectionFinished(dataImg) {

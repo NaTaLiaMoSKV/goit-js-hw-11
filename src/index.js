@@ -1,5 +1,5 @@
 import SimpleLightbox from "simplelightbox";
-import Notiflix from 'notiflix';
+import Notiflix from 'notiflix'; 
 import "simplelightbox/dist/simple-lightbox.min.css";
 import { PixabayApiService } from './api-service';
 
